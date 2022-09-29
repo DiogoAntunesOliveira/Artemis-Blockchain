@@ -1,9 +1,14 @@
 const bodyParser = require('body-parser')
 const express = require("express")
 const Blockchain = require("./Models/blockchain")
+const PubSub = require('./Redis/pubsub')
 
 const app = express()
 const blockchain = new Blockchain()
+const pubsub = new PubSub ({blockchain})
+
+
+setTimeout(() => pubsub.broadcastChain(), 1000)
 
 // User body parser to accept json on body
 app.use(bodyParser.json())
