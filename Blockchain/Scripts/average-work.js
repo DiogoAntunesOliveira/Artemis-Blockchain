@@ -1,5 +1,5 @@
 const { totalmem } = require('os');
-const Blockchain = require('./Models/blockchain')
+const Blockchain = require('../Models/blockchain')
 const blockchain = new Blockchain();
 
 blockchain.addBlock({ data: 'initial' });
