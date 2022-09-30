@@ -44,7 +44,15 @@ class PubSub {
 
     // Send a message over a designated channel
     publish({channel, message}){
-        this.publisher.publish(channel, message);
+
+        // Unsubscribe before the publish
+        this.subscriber.unsubscribe(channel, () => {
+            // Publish the message
+            this.publisher.publish(channel, message, () => {
+                // Re-subscribe the channel
+                this.subscriber.subscribe(channel)
+            });
+        });
     }
 
     // Take care of first behavior
