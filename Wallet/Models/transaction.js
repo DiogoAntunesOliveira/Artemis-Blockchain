@@ -49,29 +49,24 @@ class Transaction {
     }
 
     update({ senderWallet, recipient, amount }) {
-
-        this.outputMap[recipient] = amount;
-        this.outputMap[senderWallet.publicKey] = this.outputMap[senderWallet.publicKey] - amount;
+        // If the amount is greater than the sender's balance, throw an error
+        if (amount > this.outputMap[senderWallet.publicKey]) {
+          throw new Error('Amount exceeds balance');
+        }
+    
+        // If the recipient is already in the outputMap, add the amount to the existing amount
+        if (!this.outputMap[recipient]) {
+          this.outputMap[recipient] = amount;
+        } else {
+          this.outputMap[recipient] = this.outputMap[recipient] + amount;
+        }
+    
+        // Subtract the amount from the sender's balance
+        this.outputMap[senderWallet.publicKey] =
+          this.outputMap[senderWallet.publicKey] - amount;
+    
         this.input = this.createInput({ senderWallet, outputMap: this.outputMap });
-
-        // // Check if the amount is greater than the sender's balance
-        // if (amount > this.outputMap[senderWallet.publicKey]) {
-        //     throw new Error('Amount exceeds balance');
-        // }
-
-        // // Check if the recipient already exists in the outputMap
-        // if (this.outputMap[recipient]) {
-        //     this.outputMap[recipient] = this.outputMap[recipient] + amount;
-        // } else {
-        //     this.outputMap[recipient] = amount;
-        // }
-
-        // // Deduct the amount from the sender's balance
-        // this.outputMap[senderWallet.publicKey] = this.outputMap[senderWallet.publicKey] - amount;
-
-        // Re-sign the transaction
-        this.input = this.createInput({ senderWallet, outputMap: this.outputMap });
-    };
+      }
 }
 
 module.exports = Transaction;
