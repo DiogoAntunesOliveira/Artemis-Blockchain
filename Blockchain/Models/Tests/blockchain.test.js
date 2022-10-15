@@ -1,8 +1,7 @@
 const hexToBinary = require('hex-to-binary')
-const CryptoHash = require('../../Cryptography/crypto-hash')
 const Blockchain = require('../blockchain')
 const Block = require('../block')
-const cryptoHash = require('../../Cryptography/crypto-hash')
+const {cryptoHash} = require('../../Cryptography/index')
 
 describe('Blockchain', () => {
 	let blockchain, newChain, originalChain;
