@@ -1,11 +1,11 @@
 const crypto = require('crypto')
-const hexTobinary = require('hex-to-binary')
+const hexToBinary = require('hex-to-binary')
 
 const cryptoHash = (...inputs) => {
 	const hash = crypto.createHash('sha256')
-	hash.update(inputs.sort().join(' '))
+	hash.update(inputs.map( input => JSON.stringify(input)).sort().join(' '))
 	//hash.digest('hex')
-	//return hexTobinary(hash.digest('hex'))
+	//return hexToBinary(hash.digest('hex'))
 	return hash.digest('hex')
 }
 
