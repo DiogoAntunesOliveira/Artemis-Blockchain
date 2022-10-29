@@ -1,6 +1,8 @@
 const Transaction = require('../Models/transaction');
 const Wallet = require('../Models/index');
 const { verifySignature } = require('../../Blockchain/Cryptography');
+const {REWARD_INPUT, MINING_REWARD} = require('../../config');
+const TransactionPool = require('../Models/transaction-pool');
 
 describe('Transaction', () => {
 
@@ -176,4 +178,21 @@ describe('Transaction', () => {
         });
 
     });
+
+    describe('rewardTransaction()', () => {
+        let rewardTransaction, minerWallet;
+        
+        beforeEach(() => {
+            minerWallet = new Wallet();
+            rewardTransaction = Transaction.rewardTransaction({ minerWallet });
+        });
+
+        it('creates a transaction with the reward input', () => {
+            expect(rewardTransaction.input).toEqual(REWARD_INPUT);
+        });
+        
+        it('creates one transaction for the miner with the `MINING_REWARD`', () => {
+            expect(rewardTransaction.outputMap[minerWallet.publicKey]).toEqual(MINING_REWARD);
+        });
+    })
 }); 
