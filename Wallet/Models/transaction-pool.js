@@ -10,6 +10,10 @@ class TransactionPool {
         this.transactionMap[transaction.id] = transaction;
     }
 
+    setMap(transactionMap) {
+        this.transactionMap = transactionMap;
+    }
+
     // Get a transaction
     existingTransaction({ inputAddress }) {
         // Get all the transactions

@@ -1,22 +1,19 @@
 const redis = require('redis')
 const CHANNELS = {
     TEST: 'TEST',
-    BLOCKCHAIN: 'BLOCKCHAIN'
+    BLOCKCHAIN: 'BLOCKCHAIN',
+    TRANSACTION: 'TRANSACTION'
 }
 
 class PubSub {
-    constructor({blockchain}) {
+    constructor({ blockchain, transactionPool }) {
         this.blockchain = blockchain;
+        this.transactionPool = transactionPool
 
         this.publisher = redis.createClient()
         this.subscriber = redis.createClient()
 
-        this.subscriber.subscribe(CHANNELS.TEST)
-        this.subscriber.subscribe(CHANNELS.BLOCKCHAIN)
-
         this.subscribeToChannels()
-
-
 
         this.subscriber.on(
             'message',
@@ -28,8 +25,19 @@ class PubSub {
 
         const parsedMessage = JSON.parse(message);
 
+        switch (channel) {
+            case CHANNELS.BLOCKCHAIN:
+                this.blockchain.replaceChain(parsedMessage)
+                break;
+            case CHANNELS.TRANSACTION:
+                this.transactionPool.setTransaction(parsedMessage)
+                break;
+            default:
+                return;
+        }
+
         // Replace the chain if a longer and a valid one is received as a message on blockchain channel
-        if(channel = CHANNELS.BLOCKCHAIN){
+        if (channel === CHANNELS.BLOCKCHAIN) {
             this.blockchain.replaceChain(parsedMessage)
         }
     }
@@ -43,7 +51,7 @@ class PubSub {
     }
 
     // Send a message over a designated channel
-    publish({channel, message}){
+    publish({ channel, message }) {
 
         // Unsubscribe before the publish
         this.subscriber.unsubscribe(channel, () => {
@@ -55,11 +63,20 @@ class PubSub {
         });
     }
 
+    // We can only send strings over the channels
     // Take care of first behavior
-    broadcastChain(){
+    broadcastChain() {
         this.publish({
             channel: CHANNELS.BLOCKCHAIN,
             message: JSON.stringify(this.blockchain.chain)
+        })
+    }
+
+
+    broadcastTransaction(transaction) {
+        this.publish({
+            channel: CHANNELS.TRANSACTION,
+            message: JSON.stringify(transaction)
         })
     }
 }
